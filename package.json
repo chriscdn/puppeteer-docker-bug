@@ -1,0 +1,13 @@
+{
+  "name": "@chriscdn/puppeteer-docker-bug",
+  "version": "1.0.0",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "test": "node ./src/index.js",
+    "docker-test": "docker rm -f test-app-container 2>/dev/null && docker build -t test-app . && docker run --name test-app-container test-app"
+  },
+  "dependencies": {
+    "puppeteer": "^24.10.1"
+  }
+}
