@@ -1,57 +1,56 @@
-// float‑precision.js
-import puppeteer from "puppeteer"; // Node ≥18 supports "type": "module"; otherwise use require()
+// @ts-check
 
-(async () => {
-    // Launch the browser (adjust headless as you like)
-    const browser = await puppeteer.launch({
-        headless: "new",
-        args: ["--no-sandbox"],
-    }); // or true/false
+import puppeteer from "puppeteer";
 
-    // Create a blank page
-    const page = await browser.newPage();
+// Launch the browser (adjust headless as you like)
+const browser = await puppeteer.launch({
+    headless: true,
+    args: ["--no-sandbox"],
+}); // or true/false
 
-    const floatLiteral = 3.779528; // The problematic float from your example
+// Create a blank page
+const page = await browser.newPage();
 
-    // Execute your diagnostic code in the browser context
-    const result = await page.evaluate((value) => {
-        // Direct interpretation of the literal
-        const literal = 3.779528;
+const floatLiteral = 3.779528; // The problematic float from your example
 
-        // Passing the value from Node.js context to browser context
-        const passedValue = value;
+console.log("floatLiteral before evaluate:", floatLiteral);
 
-        // Basic arithmetic to see if it's affected
-        const multiplied = literal * 2;
-        const divided = literal / 2;
-        const added = literal + 0.000001; // Small addition to confirm precision
+// Execute your diagnostic code in the browser context
+const result = await page.evaluate((value) => {
+    // Direct interpretation of the literal
+    const literal = 3.779528;
 
-        return {
-            literal,
-            literal_type: typeof literal,
-            literal_toString: literal.toString(),
-            literal_toFixed: literal.toFixed(6), // Format to 6 decimal places
+    // Passing the value from Node.js context to browser context
+    const passedValue = value;
 
-            passedValue,
-            passedValue_type: typeof passedValue,
-            passedValue_toString: passedValue.toString(),
-            passedValue_toFixed: passedValue.toFixed(6),
+    // Basic arithmetic to see if it's affected
+    const multiplied = literal * 2;
+    const divided = literal / 2;
+    const added = literal + 0.000001; // Small addition to confirm precision
 
-            multiplied,
-            divided,
-            added,
+    return {
+        literal,
+        literal_type: typeof literal,
+        literal_toString: literal.toString(),
+        literal_toFixed: literal.toFixed(6), // Format to 6 decimal places
 
-            // userAgent: navigator.userAgent,
-            anotherFloat: 1.234567,
-            anotherFloat_toFixed: (1.234567).toFixed(6),
-        };
-    }, floatLiteral); // Pass the same float from Node.js context
+        passedValue,
+        passedValue_type: typeof passedValue,
+        passedValue_toString: passedValue.toString(),
+        passedValue_toFixed: passedValue.toFixed(6),
 
-    // Pretty‑print the results
-    console.log("\n--- Test Results ---");
-    console.log(JSON.stringify(result, null, 2));
+        multiplied,
+        divided,
+        added,
 
-    await browser.close();
-})().catch((err) => {
-    console.error("Unhandled error:", err);
-});
+        // userAgent: navigator.userAgent,
+        anotherFloat: 1.234567,
+        anotherFloat_toFixed: (1.234567).toFixed(6),
+    };
+}, floatLiteral); // Pass the same float from Node.js context
+
+// Pretty‑print the results
+console.log("\n--- Test Results ---");
+console.log(JSON.stringify(result, null, 2));
+
+await browser.close();
